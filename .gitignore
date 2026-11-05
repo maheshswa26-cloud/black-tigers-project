@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# OS generated
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Antigravity temporary
+*.tmp

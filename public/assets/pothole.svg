@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="road" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e2229"/>
+      <stop offset="100%" stop-color="#0f1115"/>
+    </linearGradient>
+    <radialGradient id="hole" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000"/>
+      <stop offset="70%" stop-color="#1c1917"/>
+      <stop offset="100%" stop-color="#ff5722"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Road Surface -->
+  <rect width="400" height="240" fill="url(#road)"/>
+  <!-- Lane Marking -->
+  <line x1="20" y1="120" x2="100" y2="120" stroke="#f59e0b" stroke-width="6" stroke-dasharray="16,12" opacity="0.4"/>
+  <line x1="300" y1="120" x2="380" y2="120" stroke="#f59e0b" stroke-width="6" stroke-dasharray="16,12" opacity="0.4"/>
+  <!-- Pothole Crater -->
+  <path d="M 120 120 C 130 90, 260 80, 290 115 C 310 140, 270 170, 230 175 C 170 180, 100 160, 120 120 Z" fill="url(#hole)" stroke="#ff5722" stroke-width="3" filter="url(#glow)"/>
+  <path d="M 150 125 C 160 105, 230 100, 260 125 C 270 145, 220 160, 180 155 Z" fill="#050505"/>
+  <!-- Warning Radar Ping -->
+  <circle cx="200" cy="130" r="60" fill="none" stroke="#ff5722" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7"/>
+  <!-- Civic Icon Badge -->
+  <circle cx="50" cy="45" r="22" fill="#ff5722" fill-opacity="0.2" stroke="#ff5722" stroke-width="2"/>
+  <text x="50" y="52" font-family="sans-serif" font-size="20" font-weight="bold" fill="#ff5722" text-anchor="middle">⚠️</text>
+  <text x="85" y="45" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff">SEVERE POTHOLE</text>
+  <text x="85" y="62" font-family="sans-serif" font-size="11" fill="#94a3b8">NAD Junction • Visakhapatnam</text>
+</svg>

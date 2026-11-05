@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0d12">
+  <meta name="description" content="Vizag Go - A gamified civic radar that crowdsources local hazards to prevent duplicate complaints in Visakhapatnam.">
+  <title>Vizag Go — Gamified Civic Hazard Radar</title>
+
+  <!-- Mapbox GL JS v3 CSS & JavaScript -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar" role="banner">
+    <div class="brand-section" id="brand-section" tabindex="0" role="button" aria-label="Go to Vizag Go Home Radar">
+      <div class="brand-radar-icon" aria-hidden="true">
+        <span style="font-size: 1.15rem;">⚡</span>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">VIZAG <span>GO</span></div>
+        <div class="brand-tagline" data-i18n="tagline">Civic Radar</div>
+      </div>
+    </div>
+
+    <nav class="nav-links" role="navigation" aria-label="Main Navigation">
+      <button class="nav-btn active" data-screen="radar" aria-current="page">
+        <span>📍</span> <span data-i18n="navRadar">Radar Map</span>
+      </button>
+      <button class="nav-btn" data-screen="camera">
+        <span>📷</span> <span data-i18n="navCamera">AI Camera</span>
+      </button>
+      <button class="nav-btn" data-screen="issues">
+        <span>📋</span> <span data-i18n="navIssues">Issue Cards</span>
+      </button>
+      <button class="nav-btn" data-screen="about">
+        <span>ℹ️</span> <span data-i18n="navAbout">About</span>
+      </button>
+    </nav>
+
+    <div class="nav-controls">
+      <!-- Gamified XP Badge -->
+      <div class="xp-badge" id="user-xp-badge" title="Citizen Rank & Radar XP">
+        <span>⚡</span> <span>Lvl 1 (40 XP)</span>
+      </div>
+
+      <!-- Bilingual English / Telugu Switcher -->
+      <button class="lang-btn" id="lang-toggle-btn" aria-label="Toggle language between English and Telugu">
+        తెలుగు
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APPLICATION CONTENT -->
+  <main class="main-content" role="main">
+
+    <!-- HERO PROMISE & STATS BANNER (Present on Radar & About) -->
+    <section class="hero-banner" aria-labelledby="hero-promise-title">
+      <div class="hero-badge-wrap">
+        <span class="pulse-dot"></span>
+        <span class="hero-tag">Visakhapatnam Community Grid • Team: black tigers</span>
+      </div>
+
+      <h1 class="hero-headline" id="hero-promise-title" data-i18n="heroHeadline">
+        A gamified civic radar that crowdsources local hazards to prevent duplicate complaints.
+      </h1>
+
+      <p class="hero-sub" data-i18n="heroSub">
+        For daily commuters who face civic hazards, Vizag Go is a map-based reporting tool that plots nearby problems on a real-time radar. Unlike official government portals, we use crowdsourced visibility to prevent duplicate reports and build community transparency.
+      </p>
+
+      <!-- 2–3 Stat Cards on Home -->
+      <div class="stat-cards-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon">📞</div>
+          <div class="stat-card-title" data-i18n="statIvrsTitle">GVMC Toll-Free IVRS (1800-4250-0009)</div>
+          <div class="stat-card-desc" data-i18n="statIvrsSub">Voice-only call center lacks visual verification, precise GPS coordinates, and crowdsourced deduplication.</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon">🏛️</div>
+          <div class="stat-card-title" data-i18n="statSpandanaTitle">In-Person Spandana Meetings on Mondays</div>
+          <div class="stat-card-desc" data-i18n="statSpandanaSub">Grievance queues take hours; citizens unknowingly submit duplicate complaints for the exact same road hazard.</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon">📊</div>
+          <div class="stat-card-title" data-i18n="statDuplicateTitle">Duplicate Reporting (ESTIMATE)</div>
+          <div class="stat-card-desc" data-i18n="statDuplicateSub">Lack of public dashboards leads to duplicate reporting (ESTIMATE: 35-40% of civic tickets are duplicates).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 1: RADAR MAP -->
+    <section id="screen-radar" class="app-screen active" aria-labelledby="radar-screen-heading">
+      <div class="radar-screen-header">
+        <div class="radar-title-group">
+          <h2 id="radar-screen-heading">
+            <span>🗺️</span> <span data-i18n="navRadar">Radar Map</span>
+            <span class="radar-sweep-indicator" data-i18n="radarLive">CIVIC RADAR ACTIVE</span>
+          </h2>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-bar" role="group" aria-label="Hazard categories filter">
+          <button class="filter-chip active" data-filter="all" data-i18n="filterAll">All Hazards</button>
+          <button class="filter-chip" data-filter="roads" data-i18n="filterRoads">Roads</button>
+          <button class="filter-chip" data-filter="sanitation" data-i18n="filterSanitation">Sanitation</button>
+          <button class="filter-chip" data-filter="electrical" data-i18n="filterElectrical">Electrical</button>
+          <button class="filter-chip" data-filter="water" data-i18n="filterWater">Water & Drain</button>
+          <button class="filter-chip" data-filter="safety" data-i18n="filterSafety">Safety</button>
+        </div>
+
+        <!-- Mapbox Style Selector -->
+        <div class="mapbox-style-bar" role="group" aria-label="Mapbox Map Theme">
+          <button class="mapbox-style-btn active" data-style="mapbox://styles/mapbox/dark-v11">🌙 Dark Radar</button>
+          <button class="mapbox-style-btn" data-style="mapbox://styles/mapbox/streets-v12">🗺️ Streets v12</button>
+          <button class="mapbox-style-btn" data-style="mapbox://styles/mapbox/satellite-streets-v12">🛰️ Satellite</button>
+        </div>
+
+        <!-- GPS Control Toolbar -->
+        <div class="gps-toolbar">
+          <div class="gps-status-pill" id="gps-status-pill" role="button" tabindex="0" title="Click to request or refresh GPS position">
+            <span>🛰️</span> <span>Acquiring GPS Signal...</span>
+          </div>
+          <button class="btn-locate-me" id="btn-locate-me" title="Fly to my real-time GPS location">
+            <span>🎯</span> <span>My Location</span>
+          </button>
+          <button class="btn-locate-me" id="btn-vizag-hub" title="Jump to Vizag Hazard Hub">
+            <span>📍</span> <span>Vizag Hub</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Map Display -->
+      <div class="map-wrapper" role="region" aria-label="Visakhapatnam Civic Radar Map">
+        <div id="map-container"></div>
+        <div class="radar-sweep-overlay" aria-hidden="true"></div>
+
+        <!-- Map Legend -->
+        <div class="map-legend" aria-label="Map Legend">
+          <div class="legend-item"><span class="legend-dot dot-user"></span> <span>You (Live GPS)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-high"></span> <span>High Severity (Urgent)</span></div>
+          <div class="legend-item"><span class="legend-dot dot-med"></span> <span>Medium Severity</span></div>
+          <div class="legend-item"><span class="legend-dot dot-low"></span> <span>Low Severity</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: AI CAMERA VIEWFINDER -->
+    <section id="screen-camera" class="app-screen" aria-labelledby="camera-screen-heading">
+      <div class="camera-container">
+        <div class="camera-header">
+          <h2 id="camera-screen-heading" data-i18n="cameraTitle">AI Civic Viewfinder</h2>
+          <p data-i18n="cameraSubtitle">Snap a photo of the hazard. Gemini AI will auto-generate title & category.</p>
+        </div>
+
+        <!-- Viewfinder Card State -->
+        <div class="viewfinder-card" id="viewfinder-card">
+          <!-- Location Preview Strip -->
+          <div class="location-preview-strip">
+            <span style="font-weight: 700; color: #fff;">
+              📍 <span data-i18n="locationPreview">Location Preview:</span>
+            </span>
+            <span class="location-coords" id="camera-location-coords">
+              Siripuram Junction, Vizag (17.729, 83.315)
+            </span>
+          </div>
+
+          <!-- Video / Snapshot Viewfinder Box -->
+          <div class="viewfinder-box">
+            <div class="viewfinder-corners"></div>
+            <div class="viewfinder-box-bottom-left"></div>
+            <div class="viewfinder-box-bottom-right"></div>
+
+            <video id="camera-video" playsinline autoplay muted></video>
+            <img id="camera-preview-img" alt="Captured civic hazard preview" />
+
+            <div class="viewfinder-placeholder" id="viewfinder-placeholder">
+              <div class="viewfinder-placeholder-icon">📸</div>
+              <p style="font-weight: 700; color: #fff; margin-bottom: 4px;">Live Viewfinder Ready</p>
+              <p style="font-size: 0.88rem; color: #94a3b8;">Use your webcam, upload an image, or click a test hazard below</p>
+            </div>
+          </div>
+
+          <!-- User Quick Notes Input -->
+          <div class="camera-input-group">
+            <label for="camera-notes-input" class="camera-input-label">
+              Citizen Notes <small style="color:var(--text-secondary);">(Optional context)</small>
+            </label>
+            <input 
+              type="text" 
+              id="camera-notes-input" 
+              class="camera-notes-input" 
+              placeholder="e.g., light dead, broken road, leaking water valve..." 
+              data-i18n="placeholderNotes"
+            />
+          </div>
+
+          <!-- File Upload Option -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <label for="camera-file-input" class="btn-secondary" style="padding:0.6rem 1rem; font-size:0.88rem; cursor:pointer;">
+              📁 Upload Photo from Device
+            </label>
+            <input type="file" id="camera-file-input" accept="image/*" class="sr-only"/>
+            <span style="font-size:0.82rem; color:var(--text-secondary);">or pick quick preset below</span>
+          </div>
+
+          <!-- Quick Test Presets (Zero friction demo) -->
+          <div class="preset-section">
+            <div class="preset-title" data-i18n="orSelectPreset">Or pick a realistic test hazard:</div>
+            <div class="preset-pills-grid">
+              <button class="preset-btn" data-preset="streetlight">
+                <span>💡</span> <span>Streetlight Outage ("light dead")</span>
+              </button>
+              <button class="preset-btn" data-preset="pothole">
+                <span>⚠️</span> <span>Crater Pothole (Siripuram)</span>
+              </button>
+              <button class="preset-btn" data-preset="garbage">
+                <span>🗑️</span> <span>Overflowing Bin (MVP Colony)</span>
+              </button>
+              <button class="preset-btn" data-preset="pipe">
+                <span>🚰</span> <span>Ruptured Pipe (Beach Road)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- THE MAIN ACTION BUTTON ON CAMERA -->
+          <div style="margin-top: 1.5rem;">
+            <button class="btn-primary-big" id="btn-capture-analyze">
+              <span>📸</span> <span data-i18n="captureButton">Capture & Analyze with Gemini</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI LOADING STATE -->
+        <div class="ai-loading-container" id="ai-loading-container" aria-live="polite">
+          <div class="ai-radar-spinner"></div>
+          <h3 class="ai-loading-title" data-i18n="analyzingState">Gemini AI is analyzing hazard photo...</h3>
+          <p class="ai-loading-sub" data-i18n="analyzingSub">Auto-detecting category, severity, and municipal recommendations...</p>
+        </div>
+
+        <!-- AI RESULT CARD (Clean Structured Output) -->
+        <div class="ai-result-container" id="ai-result-container">
+          <div class="ai-result-badge-strip">
+            <span class="ai-category-badge" id="ai-card-category">Electrical</span>
+            <span class="ai-severity-badge severity-medium" id="ai-card-severity">MEDIUM</span>
+          </div>
+
+          <h3 class="ai-result-title" id="ai-card-title">Streetlight Outage</h3>
+
+          <div class="ai-result-desc" id="ai-card-desc">
+            Streetlight fixture is inactive or damaged, reducing night visibility for commuters.
+          </div>
+
+          <div class="ai-result-action" id="ai-card-action">
+            <strong>⚡ Recommended GVMC Action:</strong> Dispatch GVMC electrical wing to replace luminaire or repair underground cable.
+          </div>
+
+          <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;" id="ai-card-source">
+            Powered by: Google Gemini AI
+          </div>
+
+          <!-- Small Stats Strip on Result Screen -->
+          <div class="result-stats-strip" style="display:flex; justify-content:space-around; background:rgba(10, 13, 18, 0.7); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.75rem; margin-bottom:1.25rem; text-align:center;">
+            <div>
+              <div style="color:var(--neon-green); font-weight:900; font-family:monospace; font-size:1.15rem;" id="result-stat-active">1,420</div>
+              <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;" data-i18n="statActiveRadars">Daily Active Radars</div>
+            </div>
+            <div style="border-left:1px solid var(--border-color); height:30px; margin:auto 0;"></div>
+            <div>
+              <div style="color:var(--neon-green); font-weight:900; font-family:monospace; font-size:1.15rem;" id="result-stat-mapped">10</div>
+              <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;" data-i18n="statIssuesMapped">Issues Mapped</div>
+            </div>
+            <div style="border-left:1px solid var(--border-color); height:30px; margin:auto 0;"></div>
+            <div>
+              <div style="color:var(--neon-green); font-weight:900; font-family:monospace; font-size:1.15rem;" id="result-stat-verified">6</div>
+              <div style="font-size:0.72rem; color:var(--text-secondary); text-transform:uppercase;" data-i18n="statIssuesVerified">Issues Verified</div>
+            </div>
+          </div>
+
+          <!-- Final Confirm Action Button -->
+          <div class="ai-result-footer-btns">
+            <button class="btn-primary-big" id="btn-confirm-pin">
+              <span data-i18n="btnConfirmPin">📍 Confirm & Pin to Civic Radar (+25 XP)</span>
+            </button>
+            <button class="btn-secondary" id="btn-retake-photo" style="width:100%;">
+              <span data-i18n="btnRetake">🔄 Retake Photo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI ERROR STATE -->
+        <div class="ai-error-container" id="ai-error-container" role="alert">
+          <div class="ai-error-icon">⚠️</div>
+          <h3 class="ai-error-title" data-i18n="cameraErrorTitle">Analysis Failed</h3>
+          <p class="ai-error-msg" data-i18n="cameraErrorMsg">
+            Could not categorize the image. Please verify your photo or try again.
+          </p>
+          <button class="btn-primary-big" id="btn-try-again" style="max-width:240px; margin:0 auto;">
+            <span data-i18n="btnTryAgain">🔄 Try Again</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: ISSUE CARDS FEED -->
+    <section id="screen-issues" class="app-screen" aria-labelledby="issues-screen-heading">
+      <div class="issues-header">
+        <h2 id="issues-screen-heading" data-i18n="issuesTitle">Crowdsourced Hazard Radar</h2>
+        <p data-i18n="issuesSubtitle">
+          Upvote existing issues so GVMC knows the true community priority and doesn't get flooded with duplicate tickets.
+        </p>
+      </div>
+
+      <!-- Feed Tab Filter -->
+      <div class="issues-tabs" role="tablist">
+        <button class="issues-tab-btn active" data-tab="all" role="tab" data-i18n="tabAll">All Issues</button>
+        <button class="issues-tab-btn" data-tab="verified" role="tab" data-i18n="tabVerified">Verified (5+ Upvotes)</button>
+        <button class="issues-tab-btn" data-tab="urgent" role="tab" data-i18n="tabUrgent">High Priority</button>
+      </div>
+
+      <!-- Grid of Issue Cards -->
+      <div class="issues-grid" id="issues-grid-container" role="region" aria-live="polite">
+        <!-- Rendered dynamically by issues.js -->
+      </div>
+    </section>
+
+    <!-- SCREEN 4: ABOUT -->
+    <section id="screen-about" class="app-screen" aria-labelledby="about-screen-heading">
+      <div class="about-container">
+        
+        <!-- Live Stats Strip -->
+        <div class="stats-strip-wrapper">
+          <div class="stats-strip-header">
+            <span>📡</span> <span data-i18n="statsStripHeading">Civic Impact Radar</span>
+          </div>
+          <div class="stats-strip-grid">
+            <div class="stats-strip-box">
+              <div class="stats-strip-num" id="stat-active-radars">1,420</div>
+              <div class="stats-strip-label" data-i18n="statActiveRadars">Daily Active Radars</div>
+            </div>
+            <div class="stats-strip-box">
+              <div class="stats-strip-num" id="stat-issues-mapped">10</div>
+              <div class="stats-strip-label" data-i18n="statIssuesMapped">Issues Mapped</div>
+            </div>
+            <div class="stats-strip-box">
+              <div class="stats-strip-num" id="stat-issues-verified">6</div>
+              <div class="stats-strip-label" data-i18n="statIssuesVerified">Issues Verified</div>
+            </div>
+            <div class="stats-strip-box">
+              <div class="stats-strip-num" id="stat-duplicates-prevented">105</div>
+              <div class="stats-strip-label" data-i18n="statDupsPrevented">Duplicates Prevented</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team & Target Users Card -->
+        <div class="about-card">
+          <div class="team-meta-pill" data-i18n="teamName">
+            🛡️ Team: black tigers
+          </div>
+          <div style="font-size:0.95rem; color:var(--text-secondary); margin-bottom:1rem;">
+            📍 <strong style="color:#fff;" data-i18n="place">Visakhapatnam, Andhra Pradesh, India</strong> • 
+            <span data-i18n="targetUsers">Users: Tech-savvy college students & young professionals (18–28)</span>
+          </div>
+
+          <h3 class="about-section-title">
+            <span>⚡</span> <span data-i18n="pitchTitle">Our Pitch</span>
+          </h3>
+          <p class="about-body-text" data-i18n="pitchBody" style="font-size:1.15rem; font-weight:700; color:var(--neon-green); margin-bottom:1.25rem;">
+            A gamified, Pokémon Go-style civic radar that publicly maps local issues to prevent duplicate reporting and build transparency.
+          </p>
+
+          <h3 class="about-section-title">
+            <span>🛑</span> <span data-i18n="problemTitle">The Problem We Solve</span>
+          </h3>
+          <p class="about-body-text" data-i18n="problemBody" style="margin-bottom:1.25rem;">
+            Citizens and GVMC waste time on duplicate, unverified complaints because there is no shared, location-based public map of local issues.
+          </p>
+
+          <h3 class="about-section-title">
+            <span>💡</span> <span data-i18n="solutionTitle">Our Solution</span>
+          </h3>
+          <p class="about-body-text" data-i18n="solutionBody" style="margin-bottom:1.25rem;">
+            For daily commuters who face civic hazards, Vizag Go is a map-based reporting tool that plots nearby problems on a real-time radar. Unlike official government portals, we use crowdsourced visibility to prevent duplicate reports and build community transparency.
+          </p>
+
+          <h3 class="about-section-title">
+            <span>✨</span> <span data-i18n="differentTitle">What Makes Us Different</span>
+          </h3>
+          <p class="about-body-text" data-i18n="differentBody" style="margin-bottom:1.25rem;">
+            None provide a publicly visible, real-time map of local issues to prevent duplicate reporting.
+          </p>
+
+          <h3 class="about-section-title">
+            <span>💼</span> <span data-i18n="businessTitle">Who Pays Later (B2G / CSR Model)</span>
+          </h3>
+          <p class="about-body-text" data-i18n="businessBody">
+            Local corporations (CSR) or Government (B2G) via CSR Sponsorship at ₹2,00,000/year per sponsor.
+          </p>
+
+          <!-- Key Status Indicator & Settings -->
+          <div style="margin-top:1.5rem; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+            <div id="key-status-indicator" style="font-size:0.88rem;">
+              Checking Gemini API status...
+            </div>
+            <button class="btn-secondary" id="btn-open-key-settings" style="padding:0.45rem 0.85rem; font-size:0.85rem;">
+              🔑 Configure Gemini Key
+            </button>
+          </div>
+
+          <!-- Danger Zone: Clear My Data -->
+          <div class="danger-zone">
+            <p style="font-size:0.9rem; color:var(--text-secondary);">
+              Reset all entries back to the original 10 sample records for a clean demonstration:
+            </p>
+            <button class="btn-danger" id="btn-clear-my-data">
+              <span data-i18n="btnClearData">🗑️ Clear My Data (Reset to Samples)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FLOATING MAIN ACTION BUTTON: SCAN HAZARD (Always accessible on map/feed) -->
+  <button class="fab-scan-btn" id="fab-scan-btn" aria-label="Scan New Civic Hazard">
+    <span>⚡</span> <span data-i18n="btnScanHazard">Scan New Hazard</span>
+  </button>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- API KEY MODAL (Optional runtime setup) -->
+  <div class="modal-overlay" id="api-key-modal" role="dialog" aria-modal="true" aria-labelledby="modal-key-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-key-title">Configure Gemini API Key</h3>
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+      <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">
+        Your key is sent securely to the local backend server via POST and is never stored in client-side code. If empty, the app uses the built-in intelligent offline vision AI engine.
+      </p>
+      <div style="margin-bottom:1.25rem;">
+        <label for="modal-key-input" style="display:block; font-size:0.85rem; font-weight:700; margin-bottom:0.35rem;">
+          Google Gemini API Key
+        </label>
+        <input 
+          type="password" 
+          id="modal-key-input" 
+          class="camera-notes-input" 
+          placeholder="AIzaSy..." 
+          autocomplete="off"
+        />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn-secondary" onclick="window.aboutManager.closeKeyModal()">Cancel</button>
+        <button class="btn-primary-big" id="btn-save-key" style="width:auto; padding:0.7rem 1.4rem; font-size:0.95rem;">
+          Save to Server
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Application Modular Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/issues.js"></script>
+  <script src="js/about.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
